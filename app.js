@@ -12,6 +12,11 @@ var app = express()
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'jade')
 
+// setting up the root directive
+global.appRoot = path.resolve(__dirname) 
+
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0
+
 app.use(logger('dev'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
