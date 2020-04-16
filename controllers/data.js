@@ -1,46 +1,66 @@
-const cheerio = require('cheerio')
-const htmlSrv = require('../services/html')
-const banks = require('../constants/enum')
+const { targets } = require('../constants/enum')
 const { selectors } = require('../constants/selector')
-const axios = require('axios')
 const util = require('../utils')
-const fs = require('fs')
+const axios = require('../helpers/axios')
+const cheerio = require('../helpers/cheerio')
+const format = require('date-format')
 
 exports.list = async (req, res, next) => {
   try {
-    let target = banks.targets[1]
-    let response = await axios.get(target.uri)
-    console.log(`crawling link ${target.uri}`)
-
-    const $ = cheerio.load(response.data)
-    let selector = selectors.find((e) => e.name === target.name)
-    let result = {
-      ul: $(selector.ul).text().trim(),
-      one: $(selector.one).text().trim(),
-      two: $(selector.two).text().trim(),
-      three: $(selector.three).text().trim(),
-      six: $(selector.six).text().trim(),
-      nine: $(selector.nine).text().trim(),
-      twelve: $(selector.twelve).text().trim(),
-      tfour: $(selector.tfour).text().trim(),
-      tsix: $(selector.tsix).text().trim(),
-      feight: $(selector.feight).text().trim(),
-      sixty: $(selector.sixty).text().trim(),
-    }
-    console.log(`completed crawling ${target.uri}`)
-    console.log('loading the recored file: ' + target.name + '.md')
-    // read a file with readFileSync to block the code below from executing
-    let data = await fs.promises.readFile(global.appRoot + '/public/data/' + target.name + '.md')
-    let recorded = JSON.parse(data)
-    if (!util.equal(recorded, result)) {
+    let result = []
+    for (let i = 0; i < targets.length; i++) {
+      let target = targets[i]
+      let each = {
+        status: '',
+        new: [],
+        old: [],
+        name: target.name,
+        url: target.uri,
+        date: format('dd:MM:yyyy hh:mm:ss', new Date()),
+      }
+      let document = await axios.fetch(target.uri)
       
+      console.log(`crawling link ${target.uri}`)
+      let selector = selectors.find((e) => e.name === target.name)
+      let newData = cheerio.parse(document, selector)
+      
+      let filePath = global.appRoot + '/public/data/' + target.name + '.md'
+      let oldData = util.getSavedData(filePath)
+      console.log(`completed crawling ${target.uri}`)
+      console.log('loading the recored file: ' + target.name + '.md')
+      if (util.equal(oldData, newData)) {
+        console.log('no change has been made...Skipping the following bank ' + target.name)
+        each.status = 'retain'
+      } else {
+        console.log('new change detected, updating ' + target.name)
+        each.status = 'update'
+        let change = util.getChanges(oldData, newData)
+        each.new = change.new
+        each.old = change.old
+        util.update(filePath, newData)
+      }
+      result.push(each)
     }
-    console.log(typeof result);
-    console.log(typeof recorded);
-    
-    res.status(200).json(result)
+    res.render('home', [
+      {
+        status: 'retain',
+        new: [],
+        old: [],
+        name: 'vib',
+        url: 'url',
+        date: format('dd:MM:yyyy hh:mm:ss', new Date()),
+      },
+      {
+        status: 'update',
+        new: [{ul: '5.5'}],
+        old: [{ul: '5'}],
+        name: 'vietcombank',
+        url: 'url',
+        date: format('dd:MM:yyyy hh:mm:ss', new Date()),
+      },
+    ])
   } catch (error) {
     console.log(error)
-    res.status(500).json({ error: error })
+    res.status(500).json({ error: error.message })
   }
 }

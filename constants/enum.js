@@ -6,7 +6,8 @@ exports.targets = [
   },
   {
     name: 'vib',
-    uri: 'https://www.vib.com.vn/wps/portal/vn/product-landing/tai-khoan-ngan-hang',
+    uri:
+      'https://www.vib.com.vn/wps/portal/vn/product-landing/tai-khoan-ngan-hang/bieu-lai-suat-tiet-kiem-tai-quay',
   },
   {
     name: 'vietinbank',
