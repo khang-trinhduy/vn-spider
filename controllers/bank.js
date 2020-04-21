@@ -13,7 +13,7 @@ module.exports = (app) => {
     '/api/bank/:id',
     handleError(async (req, res, next) => {
       const id = req.params.id
-      const bank = await Bank.findById(id)
+      let bank = await Bank.findById(id)
       res.status(200).json(bank)
     })
   )

@@ -5,6 +5,7 @@ var schema = mongoose.Schema
 
 var bankSchema = new schema({
   name: { type: String, required: true },
+  code: { type: String, required: true },
   products: [{ type: productSchema }],
 })
 

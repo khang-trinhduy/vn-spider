@@ -1,6 +1,6 @@
-add bank
-add product to bank
-get banks
-get products (product Helper)
-fetch rate from vib
-push data to rate api endpoint
+add bank [+]
+add product to bank [+]
+get banks [+]
+get products (product Helper) [+]
+fetch rate from vib [-]
+push data to rate api endpoint [-]
