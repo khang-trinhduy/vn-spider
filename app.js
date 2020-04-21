@@ -27,8 +27,11 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
+process.on('unhandledRejection', (error) => {
+  console.log('unhandledRejection', error)
+})
 
-app.use('/', routes)
+require('./routes')(app)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

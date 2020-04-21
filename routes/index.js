@@ -1,13 +1,7 @@
-var express = require('express');
-var router = express.Router();
-var dataCtrl = require('../controllers/data')
+const fs = require('fs')
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
-
-/* data router */
-router.get('/data', dataCtrl.list);
-
-module.exports = router;
+module.exports = (app) => {
+  fs.readdirSync(global.appRoot + '/controllers').forEach((file) => {
+    require(`../controllers/${file.substr(0, file.indexOf('.'))}`)(app)
+  })
+}
