@@ -46,6 +46,8 @@ parseProductFromBody = (body) => {
     return {
       name: body.name,
       content: body.content,
+      tag: body.tag,
+      bank: body.bank
     }
   } catch (error) {
     throw new Error(error.message)
