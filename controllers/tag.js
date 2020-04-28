@@ -9,8 +9,8 @@ module.exports = (app) => {
     handleError(async (req, res, next) => {
       let tags = await Tag.find({})
       tags = handleSearch(req.query.q, tags)
-      console.log(req.query);
-      
+      console.log(req.query)
+
       res.status(200).json(tags)
     })
   )
@@ -60,6 +60,7 @@ handleSearch = (query, array) => {
   if (!query) {
     return array
   }
-  array = array.filter((e) => e.name.toLowerCase().search(query) > -1)
+  const regex = new RegExp(query, 'gi')
+  array = array.filter((e) => e.name.match(regex))
   return array
 }
